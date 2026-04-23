@@ -1,0 +1,47 @@
+{
+  "pages": [
+    "pages/chat/chat",
+    "pages/horoscope/horoscope",
+    "pages/profile/profile",
+    "pages/me/me"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#7C5CFC",
+    "navigationBarTitleText": "今天会中奖吗",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F5F5F5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#7C5CFC",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/chat/chat",
+        "text": "问星",
+        "iconPath": "static/images/chat.png",
+        "selectedIconPath": "static/images/chat-active.png"
+      },
+      {
+        "pagePath": "pages/horoscope/horoscope",
+        "text": "今日运势",
+        "iconPath": "static/images/star.png",
+        "selectedIconPath": "static/images/star-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的星盘",
+        "iconPath": "static/images/profile.png",
+        "selectedIconPath": "static/images/profile-active.png"
+      },
+      {
+        "pagePath": "pages/me/me",
+        "text": "我",
+        "iconPath": "static/images/me.png",
+        "selectedIconPath": "static/images/me-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

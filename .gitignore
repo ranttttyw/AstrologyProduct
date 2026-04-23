@@ -1,0 +1,10 @@
+.env
+__pycache__/
+*.pyc
+astrology-bot/data/
+astrology-bot/venv/
+.vscode/
+.idea/
+.DS_Store
+*.db
+*.db-journal

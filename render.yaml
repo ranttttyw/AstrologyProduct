@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: xingyu-xinshi
+    runtime: python
+    region: singapore
+    plan: free
+    buildCommand: cd astrology-bot && pip install -r requirements.txt
+    startCommand: cd astrology-bot && python -m uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: DEEPSEEK_API_KEY
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: "3.11.9"

@@ -1,0 +1,112 @@
+<!-- 我的星盘页 -->
+<view class="profile-container">
+
+  <!-- 已有星盘：展示卡片 -->
+  <view class="chart-section" wx:if="{{chartData && !editing}}">
+
+    <!-- 用户基础信息卡片 -->
+    <view class="info-card">
+      <view class="info-header">
+        <view class="sun-sign-badge">
+          <text class="sun-sign-emoji">{{mainSign.emoji}}</text>
+          <text class="sun-sign-name">{{mainSign.sign}}</text>
+        </view>
+        <view class="birth-info">
+          <text class="birth-line">{{birthDate}} {{birthTime}}</text>
+          <text class="birth-line city">{{birthCity}}</text>
+        </view>
+      </view>
+
+      <!-- 三大星座 -->
+      <view class="big-three">
+        <view class="big-three-item">
+          <text class="bt-label">太阳</text>
+          <text class="bt-sign">{{chartList[0].sign}}</text>
+          <text class="bt-degree">{{chartList[0].degree_text}}</text>
+        </view>
+        <view class="bt-divider"></view>
+        <view class="big-three-item">
+          <text class="bt-label">月亮</text>
+          <text class="bt-sign">{{chartList[1].sign}}</text>
+          <text class="bt-degree">{{chartList[1].degree_text}}</text>
+        </view>
+        <view class="bt-divider"></view>
+        <view class="big-three-item">
+          <text class="bt-label">上升</text>
+          <text class="bt-sign">{{chartList[2].sign}}</text>
+          <text class="bt-degree">{{chartList[2].degree_text}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 行星详情列表 -->
+    <view class="planet-card">
+      <view class="planet-card-title">行星位置</view>
+      <view class="planet-list">
+        <view class="planet-row" wx:for="{{chartList}}" wx:key="key">
+          <view class="planet-left">
+            <text class="planet-emoji">{{item.emoji}}</text>
+            <text class="planet-name">{{item.name}}</text>
+          </view>
+          <view class="planet-right">
+            <text class="planet-sign">{{item.sign}}</text>
+            <text class="planet-degree">{{item.degree_text}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 修改按钮 -->
+    <view class="secondary-btn" bindtap="startEdit">修改星盘信息</view>
+  </view>
+
+  <!-- 未设置星盘：显示引导 -->
+  <view class="empty-state" wx:if="{{!chartData && !editing}}">
+    <text class="empty-emoji">🌟</text>
+    <text class="empty-title">还没有设置星盘</text>
+    <text class="empty-desc">告诉我你的生日，解锁专属运势和更精准的建议</text>
+    <view class="primary-btn" bindtap="startEdit">设置我的星盘</view>
+  </view>
+
+  <!-- 表单 -->
+  <view class="form-section" wx:if="{{editing}}">
+    <view class="form-card">
+      <view class="form-item">
+        <text class="form-label">出生日期</text>
+        <picker mode="date" start="1950-01-01" end="2010-12-31" value="{{formDate}}" bindchange="onDateChange">
+          <view class="picker-box">
+            <text class="picker-text {{formDate ? '' : 'placeholder'}}">{{formDate || '请选择出生日期'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">出生时间</text>
+        <picker mode="time" value="{{formTime}}" bindchange="onTimeChange">
+          <view class="picker-box">
+            <text class="picker-text {{formTime ? '' : 'placeholder'}}">{{formTime || '不确定可以跳过'}}</text>
+            <text class="picker-arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="form-item">
+        <text class="form-label">出生城市</text>
+        <input
+          class="form-input"
+          placeholder="比如：北京"
+          value="{{formCity}}"
+          bindinput="onCityInput"
+        />
+      </view>
+    </view>
+
+    <view class="primary-btn" bindtap="saveChart">
+      {{saving ? '生成中...' : (chartData ? '更新星盘' : '生成我的星盘 ✨')}}
+    </view>
+
+    <view class="secondary-btn" bindtap="cancelEdit" wx:if="{{chartData}}">取消</view>
+  </view>
+
+</view>

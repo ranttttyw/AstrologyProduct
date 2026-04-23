@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星语心事 - AI星座情绪陪伴助手</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --purple: #7C5CFC;
+  --purple-dark: #6B4FA0;
+  --purple-light: #EDE9FE;
+  --pink: #B06AB3;
+  --bg: #F5F3FF;
+  --card: #FFFFFF;
+  --text: #333333;
+  --text2: #999999;
+  --border: #F0ECF9;
+  --gradient: linear-gradient(135deg, #7C5CFC, #B06AB3);
+}
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); }
+
+/* Layout */
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh; background: var(--card); position: relative; display: flex; flex-direction: column; }
+
+/* Top Nav */
+.top-nav { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: var(--card); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; }
+.nav-tabs { display: flex; gap: 24px; }
+.nav-tab { font-size: 15px; color: var(--text2); cursor: pointer; padding-bottom: 6px; border-bottom: 2px solid transparent; background: none; border-top: none; border-left: none; border-right: none; font-family: inherit; }
+.nav-tab.active { color: var(--purple); font-weight: 600; border-bottom-color: var(--purple); }
+.nav-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--purple-light); display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--purple); font-weight: 600; }
+
+/* Page content */
+.page { flex: 1; overflow-y: auto; }
+
+/* ===== CHAT PAGE ===== */
+.welcome-card { margin: 14px; padding: 16px; background: var(--gradient); border-radius: 16px; color: #fff; }
+.welcome-label { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
+.welcome-text { font-size: 14px; line-height: 1.7; margin-bottom: 10px; }
+.welcome-scores { display: flex; gap: 14px; font-size: 12px; opacity: 0.8; flex-wrap: wrap; }
+.chat-messages { padding: 14px; min-height: 200px; }
+.msg { display: flex; margin-bottom: 14px; }
+.msg.user { justify-content: flex-end; }
+.bubble { max-width: 78%; padding: 12px 16px; font-size: 14px; line-height: 1.7; word-break: break-word; }
+.bubble.user { background: var(--purple); color: #fff; border-radius: 18px 18px 4px 18px; }
+.bubble.ai { background: #F9F8FF; color: var(--text); border-radius: 18px 18px 18px 4px; border: 1px solid var(--border); }
+.bubble.loading { color: var(--text2); font-style: italic; }
+.chat-input-bar { display: flex; gap: 10px; padding: 12px 16px; background: var(--card); border-top: 1px solid var(--border); position: sticky; bottom: 0; }
+.chat-input { flex: 1; padding: 12px 18px; border-radius: 24px; background: #F5F5F5; font-size: 14px; border: none; outline: none; font-family: inherit; }
+.chat-input:focus { background: #EFECFF; }
+.send-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--purple); color: #fff; border: none; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.send-btn:disabled { background: #ccc; }
+
+/* ===== HOROSCOPE PAGE ===== */
+.horo-header { background: var(--gradient); padding: 28px 20px; color: #fff; }
+.horo-date { font-size: 13px; opacity: 0.7; margin-bottom: 4px; }
+.horo-title { font-size: 22px; font-weight: 600; margin-bottom: 12px; }
+.horo-summary { font-size: 14px; line-height: 1.8; opacity: 0.9; }
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
+.score-item { background: #F9F8FF; border-radius: 12px; padding: 16px; text-align: center; }
+.score-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; }
+.score-stars { font-size: 18px; letter-spacing: 2px; }
+.lucky-row { display: flex; gap: 10px; padding: 0 16px 16px; }
+.lucky-item { flex: 1; border-radius: 12px; padding: 14px; text-align: center; }
+.lucky-item.color { background: var(--purple-light); }
+.lucky-item.number { background: #E1F5EE; }
+.lucky-sublabel { font-size: 12px; margin-bottom: 4px; }
+.lucky-value { font-size: 16px; font-weight: 600; }
+.tip-box { margin: 0 16px 16px; padding: 14px 18px; background: #FFF9EE; border-radius: 12px; font-size: 14px; color: #8B6914; line-height: 1.6; }
+
+/* ===== CHART PAGE ===== */
+.chart-header { background: var(--gradient); padding: 24px 20px; color: #fff; }
+.chart-birth { font-size: 13px; opacity: 0.6; margin-bottom: 16px; }
+.big-three { display: flex; justify-content: space-around; }
+.bt-item { text-align: center; }
+.bt-label { font-size: 12px; opacity: 0.6; display: block; margin-bottom: 4px; }
+.bt-sign { font-size: 20px; font-weight: 600; display: block; }
+.bt-degree { font-size: 11px; opacity: 0.5; display: block; margin-top: 2px; }
+.bt-divider { width: 1px; background: rgba(255,255,255,0.2); }
+.planet-section { padding: 16px 20px; }
+.planet-title { font-size: 14px; color: var(--text2); font-weight: 600; margin-bottom: 12px; }
+.planet-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+.planet-row:last-child { border-bottom: none; }
+
+/* Form */
+.form-section { padding: 20px; }
+.form-card { background: #F9F8FF; border-radius: 16px; padding: 20px; }
+.form-item { margin-bottom: 16px; }
+.form-label { font-size: 13px; color: var(--text2); margin-bottom: 6px; display: block; }
+.form-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border); font-size: 14px; outline: none; font-family: inherit; background: var(--card); }
+.form-input:focus { border-color: var(--purple); }
+.primary-btn { display: block; width: 100%; padding: 14px; background: var(--gradient); color: #fff; border: none; border-radius: 14px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 12px; font-family: inherit; }
+.primary-btn:disabled { opacity: 0.6; }
+.secondary-btn { display: block; width: 100%; padding: 12px; background: none; color: var(--text2); border: 1px solid var(--border); border-radius: 12px; font-size: 14px; cursor: pointer; margin-top: 10px; font-family: inherit; }
+
+/* ===== ME PAGE ===== */
+.me-header { background: var(--gradient); padding: 32px 20px; color: #fff; text-align: center; }
+.me-avatar { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 30px; }
+.me-name { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.me-desc { font-size: 13px; opacity: 0.7; }
+.info-section { padding: 16px 20px; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid var(--border); }
+.info-label { font-size: 14px; color: var(--text2); }
+.info-value { font-size: 14px; color: var(--text); }
+.gender-tags { display: flex; gap: 8px; }
+.gender-tag { font-size: 13px; padding: 6px 18px; border-radius: 20px; background: #F0F0F0; color: var(--text2); cursor: pointer; border: none; font-family: inherit; }
+.gender-tag.active { background: var(--purple); color: #fff; }
+.menu-section { padding: 0 20px 20px; }
+.menu-card { background: #F9F8FF; border-radius: 14px; overflow: hidden; }
+.menu-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 18px; border-bottom: 1px solid var(--border); font-size: 14px; cursor: pointer; }
+.menu-item:last-child { border-bottom: none; }
+.version { text-align: center; font-size: 12px; color: #ccc; padding: 16px 0; }
+.quick-tags { display: flex; flex-wrap: wrap; gap: 8px; padding: 0 20px 16px; }
+.quick-tag { font-size: 13px; padding: 6px 16px; border-radius: 20px; background: var(--purple-light); color: var(--purple); cursor: pointer; border: none; font-family: inherit; }
+.nickname-edit { display: flex; gap: 8px; align-items: center; }
+.nickname-input { padding: 6px 12px; border-radius: 8px; border: 1px solid var(--purple); font-size: 14px; width: 120px; outline: none; font-family: inherit; }
+.nickname-save { font-size: 13px; color: var(--purple); cursor: pointer; font-weight: 600; background: none; border: none; font-family: inherit; }
+
+/* Empty state */
+.empty-state { text-align: center; padding: 60px 20px; }
+.empty-emoji { font-size: 48px; display: block; margin-bottom: 12px; }
+.empty-title { font-size: 18px; font-weight: 600; margin-bottom: 8px; display: block; }
+.empty-desc { font-size: 14px; color: var(--text2); display: block; margin-bottom: 20px; line-height: 1.6; }
+
+/* Disclaimer */
+.disclaimer { text-align: center; font-size: 11px; color: #ccc; padding: 8px 20px; background: var(--card); }
+
+/* Loading */
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+.loading-dots { animation: pulse 1.2s infinite; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// ===== CONFIG =====
+const API_BASE = "";
+
+// ===== API HELPER =====
+let _memToken = "";
+function getToken() {
+  if (_memToken) return _memToken;
+  try { _memToken = localStorage.getItem("xy_token") || ""; } catch(e) {}
+  return _memToken;
+}
+function setToken(t) {
+  _memToken = t;
+  try { localStorage.setItem("xy_token", t); } catch(e) {}
+}
+
+async function api(path, data = null, method = "POST") {
+  const opts = {
+    method,
+    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${getToken()}` },
+  };
+  if (data && method !== "GET") opts.body = JSON.stringify(data);
+  const url = method === "GET" && data ? `${API_BASE}${path}?${new URLSearchParams(data)}` : `${API_BASE}${path}`;
+  const res = await fetch(method === "GET" ? url : `${API_BASE}${path}`, opts);
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json();
+}
+
+async function guestLogin() {
+  const res = await api("/api/guest-login", null, "POST");
+  setToken(res.token);
+  return res;
+}
+
+// ===== HELPERS =====
+function numToStars(n) {
+  const full = Math.min(Math.max(Math.round(n), 0), 5);
+  return "★".repeat(full) + "☆".repeat(5 - full);
+}
+
+const PLANET_ORDER = ["sun","moon","ascendant","mercury","venus","mars","jupiter","saturn","uranus","neptune","pluto"];
+const PLANET_NAMES = { sun:"☉ 太阳", moon:"☽ 月亮", ascendant:"AC 上升", mercury:"☿ 水星", venus:"♀ 金星", mars:"♂ 火星", jupiter:"♃ 木星", saturn:"♄ 土星", uranus:"♅ 天王", neptune:"♆ 海王", pluto:"♇ 冥王" };
+
+// ===== CHAT PAGE =====
+function ChatPage({ profile, horoscope }) {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef(null);
+  const inputRef = useRef(null);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+
+  const send = async (e) => {
+    if (e) e.preventDefault();
+    if (!inputRef.current) return;
+    const text = inputRef.current.value.trim();
+    if (!text || loading) return;
+    const msg = text;
+    inputRef.current.value = "";
+    inputRef.current.focus();
+    setMessages(prev => [...prev, { role: "user", content: msg }]);
+    setLoading(true);
+    try {
+      const res = await api("/api/chat", { message: msg });
+      setMessages(prev => [...prev, { role: "ai", content: res.reply }]);
+    } catch (e) {
+      setMessages(prev => [...prev, { role: "ai", content: "网络不太稳定，请稍后再试～" }]);
+    }
+    setLoading(false);
+  };
+
+  const h = horoscope;
+  return (
+    <div className="page" style={{ display: "flex", flexDirection: "column" }}>
+      {h && h.summary && (
+        <div className="welcome-card">
+          <div className="welcome-label">{h.greeting || "今日状态"}</div>
+          <div className="welcome-text">{h.summary}</div>
+          <div className="welcome-scores">
+            {h.scores && <>
+              <span>综合 {numToStars(h.scores.overall)}</span>
+              <span>爱情 {numToStars(h.scores.love)}</span>
+              <span>事业 {numToStars(h.scores.career)}</span>
+            </>}
+          </div>
+        </div>
+      )}
+      <div className="chat-messages" style={{ flex: 1 }}>
+        {messages.length === 0 && (
+          <div style={{ textAlign: "center", padding: "50px 20px 20px" }}>
+            <div style={{ fontSize: 42, marginBottom: 12 }}>✨</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--purple)", marginBottom: 8 }}>今天有什么纠结的事吗？</div>
+            <div style={{ fontSize: 13, color: "var(--text2)", marginBottom: 24, lineHeight: 1.6 }}>生活、感情、工作... 什么都可以聊</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+              {["今天出门会遇到真爱吗", "这周适合投简历吗", "今天买彩票会中奖吗", "最近水逆什么时候结束"].map(q => (
+                <button key={q} onClick={() => { if(inputRef.current) { inputRef.current.value = q; send(); } }}
+                  style={{ padding: "8px 14px", fontSize: 13, borderRadius: 20, border: "1px solid var(--border)", background: "var(--purple-light)", color: "var(--purple-dark)", cursor: "pointer" }}>
+                  {q}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        {messages.map((m, i) => (
+          <div key={i} className={`msg ${m.role === "user" ? "user" : ""}`}>
+            <div className={`bubble ${m.role === "user" ? "user" : "ai"}`}>{m.content}</div>
+          </div>
+        ))}
+        {loading && (
+          <div className="msg"><div className="bubble ai loading"><span className="loading-dots">思考中...</span></div></div>
+        )}
+        <div ref={bottomRef} />
+      </div>
+      <form className="chat-input-bar" onSubmit={send}>
+        <input ref={inputRef} className="chat-input" placeholder="描述你纠结的事情..." autoComplete="off" />
+        <button type="submit" className="send-btn" disabled={loading}>↑</button>
+      </form>
+    </div>
+  );
+}
+
+// ===== HOROSCOPE PAGE =====
+function HoroscopePage({ horoscope, profile }) {
+  const [h, setH] = useState(horoscope);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => { setH(horoscope); }, [horoscope]);
+
+  const refresh = async () => {
+    setLoading(true);
+    try {
+      const res = await api("/api/horoscope/today", null, "GET");
+      if (res && res.horoscope) setH(res.horoscope);
+    } catch (e) {}
+    setLoading(false);
+  };
+
+  useEffect(() => { if (!h && profile?.has_chart) refresh(); }, [profile]);
+
+  if (!profile?.has_chart) {
+    return (
+      <div className="page">
+        <div className="empty-state">
+          <span className="empty-emoji">🌟</span>
+          <span className="empty-title">还没有设置星盘</span>
+          <span className="empty-desc">去「星盘」页面设置你的出生信息，解锁专属运势</span>
+        </div>
+      </div>
+    );
+  }
+
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 · ${"日一二三四五六"[today.getDay()]}`;
+
+  return (
+    <div className="page">
+      <div className="horo-header">
+        <div className="horo-date">{dateStr}</div>
+        <div className="horo-title">今日运势报告</div>
+        <div className="horo-summary">{h?.summary || "加载中..."}</div>
+      </div>
+      {h?.scores && (
+        <div className="score-grid">
+          <div className="score-item"><div className="score-label">综合</div><div className="score-stars" style={{color:"#EF9F27"}}>{numToStars(h.scores.overall)}</div></div>
+          <div className="score-item"><div className="score-label">爱情</div><div className="score-stars" style={{color:"#D4537E"}}>{numToStars(h.scores.love)}</div></div>
+          <div className="score-item"><div className="score-label">事业</div><div className="score-stars" style={{color:"#534AB7"}}>{numToStars(h.scores.career)}</div></div>
+          <div className="score-item"><div className="score-label">财运</div><div className="score-stars" style={{color:"#1D9E75"}}>{numToStars(h.scores.finance)}</div></div>
+          <div className="score-item"><div className="score-label">健康</div><div className="score-stars" style={{color:"#639922"}}>{numToStars(h.scores.health)}</div></div>
+        </div>
+      )}
+      {h && (
+        <div className="lucky-row">
+          <div className="lucky-item color"><div className="lucky-sublabel" style={{color:"#534AB7"}}>幸运色</div><div className="lucky-value" style={{color:"#3C3489"}}>{h.lucky_color || "紫色"}</div></div>
+          <div className="lucky-item number"><div className="lucky-sublabel" style={{color:"#0F6E56"}}>幸运数字</div><div className="lucky-value" style={{color:"#085041"}}>{h.lucky_number || 7}</div></div>
+        </div>
+      )}
+      {h?.tip && <div className="tip-box">💡 {h.tip}</div>}
+    </div>
+  );
+}
+
+// ===== CHART PAGE =====
+function ChartPage({ profile, onUpdate }) {
+  const [editing, setEditing] = useState(false);
+  const [formDate, setFormDate] = useState("");
+  const [formTime, setFormTime] = useState("");
+  const [formCity, setFormCity] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const chart = profile?.chart_summary;
+
+  const startEdit = () => {
+    setEditing(true);
+    setFormDate(profile?.birth_date || "");
+    setFormTime(profile?.birth_time || "");
+    setFormCity(profile?.birth_city || "");
+  };
+
+  const save = async () => {
+    if (!formDate || !formCity) return;
+    setSaving(true);
+    try {
+      await api("/api/user/bindChart", { birth_date: formDate, birth_time: formTime || "12:00", birth_city: formCity });
+      setEditing(false);
+      onUpdate();
+    } catch (e) {
+      alert("保存失败，请重试");
+    }
+    setSaving(false);
+  };
+
+  if (!chart && !editing) {
+    return (
+      <div className="page">
+        <div className="empty-state">
+          <span className="empty-emoji">🌟</span>
+          <span className="empty-title">还没有设置星盘</span>
+          <span className="empty-desc">告诉我你的生日，解锁专属运势和更精准的建议</span>
+          <button className="primary-btn" style={{maxWidth: 240, margin: "0 auto"}} onClick={startEdit}>设置我的星盘 ✨</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (editing) {
+    return (
+      <div className="page">
+        <div className="form-section">
+          <div className="form-card">
+            <div className="form-item">
+              <label className="form-label">出生日期</label>
+              <input className="form-input" type="date" value={formDate} onChange={e => setFormDate(e.target.value)} />
+            </div>
+            <div className="form-item">
+              <label className="form-label">出生时间（不确定可跳过）</label>
+              <input className="form-input" type="time" value={formTime} onChange={e => setFormTime(e.target.value)} />
+            </div>
+            <div className="form-item">
+              <label className="form-label">出生城市</label>
+              <input className="form-input" type="text" placeholder="比如：北京" value={formCity} onChange={e => setFormCity(e.target.value)} />
+            </div>
+          </div>
+          <button className="primary-btn" onClick={save} disabled={saving}>{saving ? "生成中..." : (chart ? "更新星盘" : "生成我的星盘 ✨")}</button>
+          {chart && <button className="secondary-btn" onClick={() => setEditing(false)}>取消</button>}
+        </div>
+      </div>
+    );
+  }
+
+  const sun = chart?.sun || {};
+  const moon = chart?.moon || {};
+  const asc = chart?.ascendant || {};
+
+  return (
+    <div className="page">
+      <div className="chart-header">
+        <div className="chart-birth">{profile.birth_date} · {profile.birth_time || "未知"} · {profile.birth_city}</div>
+        <div className="big-three">
+          <div className="bt-item"><span className="bt-label">太阳</span><span className="bt-sign">{sun.sign}</span><span className="bt-degree">{sun.degree_text}</span></div>
+          <div className="bt-divider" />
+          <div className="bt-item"><span className="bt-label">月亮</span><span className="bt-sign">{moon.sign}</span><span className="bt-degree">{moon.degree_text}</span></div>
+          <div className="bt-divider" />
+          <div className="bt-item"><span className="bt-label">上升</span><span className="bt-sign">{asc.sign}</span><span className="bt-degree">{asc.degree_text}</span></div>
+        </div>
+      </div>
+      <div className="planet-section">
+        <div className="planet-title">行星位置</div>
+        {PLANET_ORDER.map(key => chart[key] && (
+          <div className="planet-row" key={key}>
+            <span>{PLANET_NAMES[key]}</span>
+            <span style={{color: "var(--text2)"}}>{chart[key].sign} {chart[key].degree_text || ""}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{padding: "0 20px 20px"}}>
+        <button className="secondary-btn" onClick={startEdit}>修改星盘信息</button>
+      </div>
+    </div>
+  );
+}
+
+// ===== ME PAGE =====
+function MePage({ profile, onUpdate }) {
+  const [editingNickname, setEditingNickname] = useState(false);
+  const [nicknameInput, setNicknameInput] = useState("");
+  const [editingOccupation, setEditingOccupation] = useState(false);
+  const [occupationInput, setOccupationInput] = useState("");
+
+  const nickname = profile?.nickname || "";
+  const gender = profile?.gender || "";
+  const occupation = profile?.occupation || "";
+  const sunSign = profile?.chart_summary?.sun?.sign || "";
+
+  const saveNickname = async () => {
+    if (!nicknameInput.trim()) return;
+    try {
+      await api("/api/user/nickname", { nickname: nicknameInput.trim() });
+      setEditingNickname(false);
+      onUpdate();
+    } catch (e) {}
+  };
+
+  const setGender = async (g) => {
+    try {
+      await api("/api/user/info", { gender: g });
+      onUpdate();
+    } catch (e) {}
+  };
+
+  const saveOccupation = async (val) => {
+    const v = val || occupationInput.trim();
+    if (!v) return;
+    try {
+      await api("/api/user/info", { occupation: v });
+      setEditingOccupation(false);
+      onUpdate();
+    } catch (e) {}
+  };
+
+  return (
+    <div className="page">
+      <div className="me-header">
+        <div className="me-avatar">🌙</div>
+        <div className="me-name">{nickname || "点击设置昵称"}</div>
+        <div className="me-desc">{sunSign ? `${sunSign} · 已设置星盘` : "还没有设置星盘"}</div>
+      </div>
+      <div className="info-section">
+        <div className="info-row">
+          <span className="info-label">昵称</span>
+          {editingNickname ? (
+            <div className="nickname-edit">
+              <input className="nickname-input" value={nicknameInput} onChange={e => setNicknameInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && saveNickname()} autoFocus maxLength={20} />
+              <button className="nickname-save" onClick={saveNickname}>确定</button>
+            </div>
+          ) : (
+            <span className="info-value" style={{cursor:"pointer"}} onClick={() => { setEditingNickname(true); setNicknameInput(nickname); }}>
+              {nickname || "点击设置"} ✏️
+            </span>
+          )}
+        </div>
+        <div className="info-row">
+          <span className="info-label">性别</span>
+          <div className="gender-tags">
+            {["女","男","其他"].map(g => (
+              <button key={g} className={`gender-tag ${gender === g ? "active" : ""}`} onClick={() => setGender(g)}>
+                {g === "女" ? "♀ " : g === "男" ? "♂ " : ""}{g}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="info-row">
+          <span className="info-label">职业</span>
+          {editingOccupation ? (
+            <div className="nickname-edit">
+              <input className="nickname-input" value={occupationInput} onChange={e => setOccupationInput(e.target.value)}
+                onKeyDown={e => e.key === "Enter" && saveOccupation()} autoFocus maxLength={20} placeholder="比如：学生" />
+              <button className="nickname-save" onClick={() => saveOccupation()}>确定</button>
+            </div>
+          ) : (
+            <span className="info-value" style={{cursor:"pointer"}} onClick={() => { setEditingOccupation(true); setOccupationInput(occupation); }}>
+              {occupation || "点击设置"}
+            </span>
+          )}
+        </div>
+      </div>
+      {editingOccupation && (
+        <div className="quick-tags">
+          {["学生","上班族","自由职业","创业者"].map(v => (
+            <button key={v} className="quick-tag" onClick={() => saveOccupation(v)}>{v}</button>
+          ))}
+        </div>
+      )}
+      <div className="version">星语心事 v1.0.0</div>
+      <div className="disclaimer">本应用内容基于星座文化，仅供娱乐参考，不构成任何决策建议</div>
+    </div>
+  );
+}
+
+// ===== APP =====
+function App() {
+  const [tab, setTab] = useState("chat");
+  const [profile, setProfile] = useState(null);
+  const [horoscope, setHoroscope] = useState(null);
+  const [ready, setReady] = useState(false);
+
+  const loadProfile = useCallback(async () => {
+    try {
+      const res = await api("/api/user/profile", null, "GET");
+      setProfile(res);
+      return res;
+    } catch (e) { return null; }
+  }, []);
+
+  const loadHoroscope = useCallback(async () => {
+    try {
+      const res = await api("/api/horoscope/today", null, "GET");
+      if (res && res.horoscope) setHoroscope(res.horoscope);
+    } catch (e) {}
+  }, []);
+
+  useEffect(() => {
+    (async () => {
+      let token = getToken();
+      if (!token) {
+        await guestLogin();
+      }
+      let p = await loadProfile();
+      if (!p) {
+        // token 无效，重新登录
+        await guestLogin();
+        p = await loadProfile();
+      }
+      if (p?.has_chart) await loadHoroscope();
+      setReady(true);
+    })();
+  }, []);
+
+  const handleUpdate = async () => {
+    const p = await loadProfile();
+    if (p?.has_chart) await loadHoroscope();
+  };
+
+  if (!ready) {
+    return (
+      <div className="app" style={{display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <div style={{textAlign:"center",color:"var(--text2)"}}>
+          <div style={{fontSize:36,marginBottom:12}}>✨</div>
+          <div>加载中...</div>
+        </div>
+      </div>
+    );
+  }
+
+  const tabs = [
+    { key: "chat", label: "星语" },
+    { key: "horoscope", label: "运势" },
+    { key: "chart", label: "星盘" },
+    { key: "me", label: "我的" },
+  ];
+
+  return (
+    <div className="app">
+      <div className="top-nav">
+        <div className="nav-tabs">
+          {tabs.map(t => (
+            <button key={t.key} className={`nav-tab ${tab === t.key ? "active" : ""}`} onClick={() => setTab(t.key)}>
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <div className="nav-avatar" onClick={() => setTab("me")}>{(profile?.nickname || "U")[0]}</div>
+      </div>
+      <div style={{display: tab === "chat" ? "flex" : "none", flexDirection: "column", flex: 1}}><ChatPage profile={profile} horoscope={horoscope} /></div>
+      <div style={{display: tab === "horoscope" ? "block" : "none", flex: 1}}><HoroscopePage profile={profile} horoscope={horoscope} /></div>
+      <div style={{display: tab === "chart" ? "block" : "none", flex: 1}}><ChartPage profile={profile} onUpdate={handleUpdate} /></div>
+      <div style={{display: tab === "me" ? "block" : "none", flex: 1}}><MePage profile={profile} onUpdate={handleUpdate} /></div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!-- 今日运势页 -->
+<view class="horoscope-container">
+
+  <!-- 日期头部 -->
+  <view class="date-header">
+    <text class="date-text">{{dateText}}</text>
+    <text class="weekday">{{weekday}}</text>
+  </view>
+
+  <!-- 运势卡片 -->
+  <view class="horoscope-card" wx:if="{{horoscope}}">
+    <view class="greeting-row">
+      <text class="greeting-text">{{horoscope.greeting}} ☀️</text>
+    </view>
+    <view class="summary-text">{{horoscope.summary}}</view>
+
+    <!-- 维度评分 -->
+    <view class="dimension-grid" wx:if="{{horoscope.scores}}">
+      <view class="dim-item">
+        <text class="dim-label">综合</text>
+        <text class="dim-stars">{{scores.overall}}</text>
+      </view>
+      <view class="dim-item">
+        <text class="dim-label">爱情</text>
+        <text class="dim-stars">{{scores.love}}</text>
+      </view>
+      <view class="dim-item">
+        <text class="dim-label">事业</text>
+        <text class="dim-stars">{{scores.career}}</text>
+      </view>
+      <view class="dim-item">
+        <text class="dim-label">财运</text>
+        <text class="dim-stars">{{scores.finance}}</text>
+      </view>
+      <view class="dim-item">
+        <text class="dim-label">健康</text>
+        <text class="dim-stars">{{scores.health}}</text>
+      </view>
+    </view>
+
+    <!-- 幸运色和幸运数字 -->
+    <view class="lucky-section" wx:if="{{horoscope.lucky_color}}">
+      <view class="lucky-item">🎨 幸运色：{{horoscope.lucky_color}}</view>
+      <view class="lucky-item">🔢 幸运数字：{{horoscope.lucky_number}}</view>
+    </view>
+
+    <!-- 小贴士 -->
+    <view class="tip-section" wx:if="{{horoscope.tip}}">
+      💡 {{horoscope.tip}}
+    </view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="horoscope-card loading-card" wx:if="{{loading}}">
+    <view class="card-icon">✨</view>
+    <view class="card-content" style="color: #999;">正在查看今日星象...</view>
+  </view>
+
+  <!-- 未设置星盘 -->
+  <view class="empty-card" wx:if="{{!hasChart && !loading}}">
+    <view class="card-icon">🌟</view>
+    <view class="card-content">设置星盘后才能看到专属运势哦～</view>
+    <view class="link-btn" bindtap="goToProfile">去设置星盘</view>
+  </view>
+
+  <!-- 跳转聊天 -->
+  <view class="action-section" wx:if="{{horoscope}}">
+    <view class="action-btn" bindtap="goToChat">
+      有纠结的事？去问问 →
+    </view>
+  </view>
+</view>

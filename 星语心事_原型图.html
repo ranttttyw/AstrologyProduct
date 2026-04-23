@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>星语心事 - Web原型图</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #F3F0FF; min-height: 100vh; padding: 40px 20px; }
+h1 { text-align: center; color: #6B4FA0; font-size: 28px; margin-bottom: 8px; }
+.subtitle { text-align: center; color: #999; font-size: 14px; margin-bottom: 40px; }
+.pages { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 32px; max-width: 1200px; margin: 0 auto; }
+.page-wrapper { text-align: center; }
+.page-label { font-size: 13px; color: #7C5CFC; font-weight: 600; margin-bottom: 12px; letter-spacing: 1px; }
+.phone { width: 340px; margin: 0 auto; background: #fff; border-radius: 32px; overflow: hidden; box-shadow: 0 8px 40px rgba(124,92,252,0.15); border: 3px solid #E8E4F0; }
+.phone-notch { height: 32px; background: #fff; display: flex; align-items: center; justify-content: center; }
+.notch-bar { width: 100px; height: 6px; background: #E8E4F0; border-radius: 3px; }
+.phone-bottom { height: 20px; background: #fff; }
+
+/* Nav */
+.nav { display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; background: #fff; border-bottom: 1px solid #F0F0F0; }
+.nav-tabs { display: flex; gap: 20px; }
+.nav-tab { font-size: 14px; color: #999; cursor: pointer; padding-bottom: 6px; border-bottom: 2px solid transparent; }
+.nav-tab.active { color: #7C5CFC; font-weight: 600; border-bottom-color: #7C5CFC; }
+.nav-avatar { width: 30px; height: 30px; border-radius: 50%; background: #EDE9FE; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #7C5CFC; font-weight: 600; }
+
+/* Welcome card */
+.welcome-card { margin: 14px; padding: 16px; background: linear-gradient(135deg, #7C5CFC, #B06AB3); border-radius: 14px; color: #fff; text-align: left; }
+.welcome-label { font-size: 12px; opacity: 0.7; margin-bottom: 6px; }
+.welcome-text { font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
+.welcome-scores { display: flex; gap: 14px; font-size: 11px; opacity: 0.8; }
+
+/* Chat */
+.chat-area { padding: 14px; min-height: 200px; background: #FAFAFA; }
+.msg { display: flex; margin-bottom: 12px; }
+.msg.user { justify-content: flex-end; }
+.bubble { max-width: 75%; padding: 10px 16px; font-size: 13px; line-height: 1.6; }
+.bubble.user { background: #7C5CFC; color: #fff; border-radius: 18px 18px 4px 18px; }
+.bubble.ai { background: #fff; color: #333; border-radius: 18px 18px 18px 4px; border: 1px solid #F0F0F0; }
+.chat-input { display: flex; gap: 8px; padding: 10px 14px; background: #fff; border-top: 1px solid #F0F0F0; align-items: center; }
+.chat-input-box { flex: 1; padding: 10px 16px; border-radius: 22px; background: #F5F5F5; font-size: 13px; color: #999; border: none; }
+.send-btn { width: 34px; height: 34px; border-radius: 50%; background: #7C5CFC; color: #fff; border: none; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+/* Horoscope */
+.horo-header { background: linear-gradient(135deg, #7C5CFC, #B06AB3); padding: 24px 20px; color: #fff; text-align: left; }
+.horo-date { font-size: 13px; opacity: 0.7; margin-bottom: 4px; }
+.horo-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; }
+.horo-summary { font-size: 13px; line-height: 1.7; opacity: 0.9; }
+.score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px; }
+.score-item { background: #F9F8FF; border-radius: 10px; padding: 14px; text-align: center; }
+.score-label { font-size: 12px; color: #999; margin-bottom: 4px; }
+.score-stars { font-size: 15px; }
+.lucky-row { display: flex; gap: 10px; padding: 0 16px 16px; }
+.lucky-item { flex: 1; border-radius: 10px; padding: 12px; text-align: center; }
+.lucky-item.color { background: #EEEDFE; }
+.lucky-item.number { background: #E1F5EE; }
+.lucky-sublabel { font-size: 11px; margin-bottom: 2px; }
+.lucky-value { font-size: 15px; font-weight: 600; }
+.tip-box { margin: 0 16px 16px; padding: 12px 16px; background: #FFF9EE; border-radius: 10px; font-size: 13px; color: #8B6914; line-height: 1.5; }
+
+/* Profile / Chart */
+.chart-header { background: linear-gradient(135deg, #7C5CFC, #B06AB3); padding: 22px 20px; color: #fff; }
+.chart-birth { font-size: 12px; opacity: 0.6; margin-bottom: 14px; }
+.big-three { display: flex; justify-content: space-around; }
+.big-three-item { text-align: center; }
+.bt-label { font-size: 11px; opacity: 0.6; display: block; margin-bottom: 4px; }
+.bt-sign { font-size: 18px; font-weight: 600; display: block; }
+.bt-degree { font-size: 10px; opacity: 0.5; display: block; margin-top: 2px; }
+.bt-divider { width: 1px; background: rgba(255,255,255,0.2); }
+.planet-section { padding: 14px 20px; }
+.planet-title { font-size: 13px; color: #999; font-weight: 600; margin-bottom: 10px; }
+.planet-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #F5F5F5; font-size: 13px; }
+.planet-row:last-child { border-bottom: none; }
+.planet-name { color: #333; }
+.planet-info { color: #999; }
+.edit-btn { display: block; margin: 10px 20px 16px; padding: 12px; text-align: center; border: 1px solid #E0E0E0; border-radius: 10px; font-size: 13px; color: #666; cursor: pointer; background: #fff; }
+
+/* Me page */
+.me-header { background: linear-gradient(135deg, #7C5CFC, #B06AB3); padding: 30px 20px; color: #fff; text-align: center; }
+.me-avatar { width: 60px; height: 60px; border-radius: 50%; background: rgba(255,255,255,0.2); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.me-name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+.me-desc { font-size: 12px; opacity: 0.7; }
+.info-section { padding: 16px 20px; }
+.info-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #F5F5F5; }
+.info-label { font-size: 13px; color: #999; }
+.info-value { font-size: 13px; color: #333; }
+.gender-tags { display: flex; gap: 8px; }
+.gender-tag { font-size: 12px; padding: 5px 16px; border-radius: 20px; background: #F0F0F0; color: #999; }
+.gender-tag.active { background: #7C5CFC; color: #fff; }
+.menu-section { padding: 0 20px 16px; }
+.menu-card { background: #F9F8FF; border-radius: 12px; overflow: hidden; }
+.menu-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #F0ECF9; font-size: 13px; color: #333; }
+.menu-item:last-child { border-bottom: none; }
+.menu-arrow { color: #ccc; }
+.version { text-align: center; font-size: 11px; color: #ccc; padding: 12px 0; }
+</style>
+</head>
+<body>
+
+<h1>星语心事</h1>
+<p class="subtitle">AI × 星座 · 情绪陪伴与决策参考助手 · Web版原型</p>
+
+<div class="pages">
+
+<!-- ========== PAGE 1: CHAT ========== -->
+<div class="page-wrapper">
+<div class="page-label">PAGE 1 — 星语（聊天）</div>
+<div class="phone">
+<div class="phone-notch"><div class="notch-bar"></div></div>
+<div class="nav">
+<div class="nav-tabs">
+<span class="nav-tab active">星语</span>
+<span class="nav-tab">运势</span>
+<span class="nav-tab">星盘</span>
+<span class="nav-tab">我的</span>
+</div>
+<div class="nav-avatar">Y</div>
+</div>
+<div class="welcome-card">
+<div class="welcome-label">今日状态</div>
+<div class="welcome-text">今天灵感满满，适合做创意类的事。不过下午容易分心，重要决定留到上午。</div>
+<div class="welcome-scores">
+<span>综合 ★★★★☆</span>
+<span>爱情 ★★★☆☆</span>
+</div>
+</div>
+<div class="chat-area">
+<div class="msg user"><div class="bubble user">今天适合投简历吗？</div></div>
+<div class="msg"><div class="bubble ai">今天整体能量很适合主动出击！我觉得你直接投就对了，别拖。你是想投大厂还是创业公司？</div></div>
+<div class="msg user"><div class="bubble user">大厂和国企选哪个</div></div>
+<div class="msg"><div class="bubble ai">说真的，你太阳水瓶更适合有创新空间的环境。大厂节奏快但能学到东西，我觉得对你现阶段更合适。</div></div>
+</div>
+<div class="chat-input">
+<div class="chat-input-box">描述你纠结的事情...</div>
+<button class="send-btn">↑</button>
+</div>
+<div class="phone-bottom"></div>
+</div>
+</div>
+
+<!-- ========== PAGE 2: HOROSCOPE ========== -->
+<div class="page-wrapper">
+<div class="page-label">PAGE 2 — 今日运势</div>
+<div class="phone">
+<div class="phone-notch"><div class="notch-bar"></div></div>
+<div class="nav">
+<div class="nav-tabs">
+<span class="nav-tab">星语</span>
+<span class="nav-tab active">运势</span>
+<span class="nav-tab">星盘</span>
+<span class="nav-tab">我的</span>
+</div>
+<div class="nav-avatar">Y</div>
+</div>
+<div class="horo-header">
+<div class="horo-date">2026年4月22日 · 周三</div>
+<div class="horo-title">今日运势报告</div>
+<div class="horo-summary">今天灵感爆棚，适合做创意类的事。水星状态不错，沟通表达很顺畅。不过下午火星有点躁，别跟人争论。</div>
+</div>
+<div class="score-grid">
+<div class="score-item"><div class="score-label">综合</div><div class="score-stars" style="color:#EF9F27;">★★★★☆</div></div>
+<div class="score-item"><div class="score-label">爱情</div><div class="score-stars" style="color:#D4537E;">★★★★☆</div></div>
+<div class="score-item"><div class="score-label">事业</div><div class="score-stars" style="color:#534AB7;">★★★☆☆</div></div>
+<div class="score-item"><div class="score-label">财运</div><div class="score-stars" style="color:#1D9E75;">★★★★☆</div></div>
+</div>
+<div class="lucky-row">
+<div class="lucky-item color"><div class="lucky-sublabel" style="color:#534AB7;">幸运色</div><div class="lucky-value" style="color:#3C3489;">天蓝色</div></div>
+<div class="lucky-item number"><div class="lucky-sublabel" style="color:#0F6E56;">幸运数字</div><div class="lucky-value" style="color:#085041;">7</div></div>
+</div>
+<div class="tip-box">💡 重要决定不妨留到午后思绪更清明时再做</div>
+<div class="phone-bottom"></div>
+</div>
+</div>
+
+<!-- ========== PAGE 3: CHART ========== -->
+<div class="page-wrapper">
+<div class="page-label">PAGE 3 — 星盘档案</div>
+<div class="phone">
+<div class="phone-notch"><div class="notch-bar"></div></div>
+<div class="nav">
+<div class="nav-tabs">
+<span class="nav-tab">星语</span>
+<span class="nav-tab">运势</span>
+<span class="nav-tab active">星盘</span>
+<span class="nav-tab">我的</span>
+</div>
+<div class="nav-avatar">Y</div>
+</div>
+<div class="chart-header">
+<div class="chart-birth">2004-08-02 · 23:30 · 宁波</div>
+<div class="big-three">
+<div class="big-three-item"><span class="bt-label">太阳</span><span class="bt-sign">狮子座</span><span class="bt-degree">10°40'</span></div>
+<div class="bt-divider"></div>
+<div class="big-three-item"><span class="bt-label">月亮</span><span class="bt-sign">双子座</span><span class="bt-degree">15°22'</span></div>
+<div class="bt-divider"></div>
+<div class="big-three-item"><span class="bt-label">上升</span><span class="bt-sign">白羊座</span><span class="bt-degree">8°15'</span></div>
+</div>
+</div>
+<div class="planet-section">
+<div class="planet-title">行星位置</div>
+<div class="planet-row"><span class="planet-name">☿ 水星</span><span class="planet-info">狮子座 28°05'</span></div>
+<div class="planet-row"><span class="planet-name">♀ 金星</span><span class="planet-info">双子座 22°18'</span></div>
+<div class="planet-row"><span class="planet-name">♂ 火星</span><span class="planet-info">白羊座 15°33'</span></div>
+<div class="planet-row"><span class="planet-name">♃ 木星</span><span class="planet-info">处女座 04°12'</span></div>
+<div class="planet-row"><span class="planet-name">♄ 土星</span><span class="planet-info">巨蟹座 18°50'</span></div>
+<div class="planet-row"><span class="planet-name">♅ 天王</span><span class="planet-info">双鱼座 26°07'</span></div>
+<div class="planet-row"><span class="planet-name">♆ 海王</span><span class="planet-info">水瓶座 14°33'</span></div>
+</div>
+<div class="edit-btn">修改星盘信息</div>
+<div class="phone-bottom"></div>
+</div>
+</div>
+
+<!-- ========== PAGE 4: ME ========== -->
+<div class="page-wrapper">
+<div class="page-label">PAGE 4 — 我的</div>
+<div class="phone">
+<div class="phone-notch"><div class="notch-bar"></div></div>
+<div class="nav">
+<div class="nav-tabs">
+<span class="nav-tab">星语</span>
+<span class="nav-tab">运势</span>
+<span class="nav-tab">星盘</span>
+<span class="nav-tab active">我的</span>
+</div>
+<div class="nav-avatar">Y</div>
+</div>
+<div class="me-header">
+<div class="me-avatar">🌙</div>
+<div class="me-name">总裁</div>
+<div class="me-desc">狮子座 · 已设置星盘</div>
+</div>
+<div class="info-section">
+<div class="info-row">
+<span class="info-label">性别</span>
+<div class="gender-tags">
+<span class="gender-tag active">♀ 女</span>
+<span class="gender-tag">♂ 男</span>
+<span class="gender-tag">其他</span>
+</div>
+</div>
+<div class="info-row">
+<span class="info-label">职业</span>
+<span class="info-value">学生</span>
+</div>
+<div class="info-row">
+<span class="info-label">昵称</span>
+<span class="info-value">总裁 ✏️</span>
+</div>
+</div>
+<div class="menu-section">
+<div class="menu-card">
+<div class="menu-item"><span>🔮 我的星盘</span><span class="menu-arrow">›</span></div>
+<div class="menu-item"><span>💬 聊天记录</span><span class="menu-arrow">›</span></div>
+<div class="menu-item"><span>📖 使用指南</span><span class="menu-arrow">›</span></div>
+<div class="menu-item"><span>💡 意见反馈</span><span class="menu-arrow">›</span></div>
+</div>
+</div>
+<div class="version">星语心事 v1.0.0</div>
+<div class="phone-bottom"></div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

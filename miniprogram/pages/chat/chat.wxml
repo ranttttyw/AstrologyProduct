@@ -1,0 +1,119 @@
+<!-- 聊天页面 -->
+<view class="chat-container">
+
+  <!-- 未设置星盘提示 -->
+  <view class="guide-banner" wx:if="{{!hasChart}}" bindtap="goToProfile">
+    <text class="guide-text">✨ 设置你的星盘，获得更精准的解读</text>
+    <text class="guide-arrow">去设置 ›</text>
+  </view>
+
+  <!-- 聊天消息列表 -->
+  <scroll-view
+    scroll-y
+    class="message-list"
+    scroll-into-view="{{scrollToId}}"
+    scroll-with-animation
+    enhanced="{{true}}"
+    show-scrollbar="{{false}}"
+  >
+    <!-- 今日运势欢迎卡片 -->
+    <view class="message bot" id="msg-welcome" wx:if="{{horoscope}}">
+      <view class="avatar bot-avatar">✨</view>
+      <view class="welcome-card">
+        <view class="welcome-greeting">{{horoscope.greeting}} ☀️</view>
+        <view class="welcome-summary">{{horoscope.summary}}</view>
+
+        <!-- 维度评分 -->
+        <view class="score-grid" wx:if="{{horoscope.scores}}">
+          <view class="score-item">
+            <text class="score-label">综合</text>
+            <text class="score-stars">{{scores.overall}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">爱情</text>
+            <text class="score-stars">{{scores.love}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">事业</text>
+            <text class="score-stars">{{scores.career}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">财运</text>
+            <text class="score-stars">{{scores.finance}}</text>
+          </view>
+          <view class="score-item">
+            <text class="score-label">健康</text>
+            <text class="score-stars">{{scores.health}}</text>
+          </view>
+        </view>
+
+        <!-- 幸运色和幸运数字 -->
+        <view class="lucky-row" wx:if="{{horoscope.lucky_color}}">
+          <text class="lucky-tag">🎨 {{horoscope.lucky_color}}</text>
+          <text class="lucky-tag">🔢 {{horoscope.lucky_number}}</text>
+        </view>
+
+        <!-- 小贴士 -->
+        <view class="welcome-tip" wx:if="{{horoscope.tip}}">💡 {{horoscope.tip}}</view>
+      </view>
+    </view>
+
+    <!-- 无运势时的简单欢迎 -->
+    <view class="message bot" id="msg-welcome" wx:if="{{!horoscope}}">
+      <view class="avatar bot-avatar">✨</view>
+      <view class="bubble bot-bubble">嗨～有什么纠结的事情跟我说说？</view>
+    </view>
+
+    <!-- 消息列表 -->
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="message {{item.role === 'user' ? 'user' : 'bot'}}" id="msg-{{item.id}}">
+        <view class="avatar {{item.role === 'user' ? 'user-avatar' : 'bot-avatar'}}">
+          {{item.role === 'user' ? '🙋' : '✨'}}
+        </view>
+        <view class="bubble {{item.role === 'user' ? 'user-bubble' : 'bot-bubble'}}">
+          {{item.content}}
+        </view>
+      </view>
+    </block>
+
+    <!-- 加载动画 -->
+    <view class="message bot" wx:if="{{isLoading}}" id="msg-loading">
+      <view class="avatar bot-avatar">✨</view>
+      <view class="bubble bot-bubble loading-bubble">
+        <view class="loading-dots">
+          <view class="dot"></view>
+          <view class="dot"></view>
+          <view class="dot"></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 底部占位 -->
+    <view style="height: 20rpx;" id="msg-bottom"></view>
+  </scroll-view>
+
+  <!-- 快捷问题 -->
+  <view class="quick-section" wx:if="{{messages.length === 0}}">
+    <view class="quick-btn" bindtap="quickAsk" data-q="今天适合投简历吗？">今天适合投简历吗？</view>
+    <view class="quick-btn" bindtap="quickAsk" data-q="今天运势怎么样？">今天运势怎么样？</view>
+    <view class="quick-btn" bindtap="quickAsk" data-q="适合跟暧昧对象主动联系吗？">适合主动联系ta吗？</view>
+  </view>
+
+  <!-- 输入框 -->
+  <view class="input-bar">
+    <input
+      class="message-input"
+      placeholder="描述你纠结的事情..."
+      placeholder-style="color: #bbb;"
+      value="{{inputText}}"
+      bindinput="onInput"
+      confirm-type="send"
+      bindconfirm="sendMessage"
+      adjust-position="{{true}}"
+    />
+    <view
+      class="send-btn {{inputText && !isLoading ? 'active' : ''}}"
+      bindtap="sendMessage"
+    >发送</view>
+  </view>
+</view>

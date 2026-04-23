@@ -1,0 +1,11 @@
+/* 全局样式 */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 28rpx;
+  color: #333;
+  background-color: #F5F5F5;
+}
+
+/* 主题色 */
+.text-primary { color: #7C5CFC; }
+.bg-primary { background-color: #7C5CFC; }
